@@ -32,8 +32,9 @@ exports.getEditProduct = (req, res, next) => {
   if (!editMode) {
     return res.redirect(`/`);
   }
-  const prodId = req.params.edit;
+  const prodId = req.params.productId;
   Product.getItemById(prodId, (product) => {
+    console.log(product);
     res.render("./admin/edit-product", {
       pageTitle: "Edit Product",
       path: `none`,
