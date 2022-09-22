@@ -4,6 +4,7 @@ exports.getAddProduct = (req, res, next) => {
   res.render("./admin/edit-product", {
     pageTitle: "Add Product",
     path: "/admin/add-product",
+    editing: false,
   });
 };
 
@@ -28,10 +29,16 @@ exports.getProducts = (req, res, next) => {
 };
 exports.getEditProduct = (req, res, next) => {
   const editMode = req.query.edit;
-  console.log(editMode);
-  res.render("./admin/edit-product", {
-    pageTitle: "Edit Product",
-    path: `none`,
-    editing: editMode,
+  if (!editMode) {
+    return res.redirect(`/`);
+  }
+  const prodId = req.params.edit;
+  Product.getItemById(prodId, (product) => {
+    res.render("./admin/edit-product", {
+      pageTitle: "Edit Product",
+      path: `none`,
+      editing: editMode,
+      product: product,
+    });
   });
 };
