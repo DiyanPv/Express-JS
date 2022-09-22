@@ -7,8 +7,6 @@ exports.getShopPage = (req, res, next) => {
       pageTitle: "Shop",
       path: "/",
       hasProducts: product.length > 0,
-      activeShop: true,
-      productCSS: true,
     });
   });
 };
@@ -19,9 +17,6 @@ exports.getIndex = (req, res, next) => {
       prods: product,
       pageTitle: "Home Page",
       path: "/",
-      hasProducts: product.length > 0,
-      activeShop: true,
-      productCSS: true,
     });
   });
 };
@@ -32,9 +27,6 @@ exports.getCart = (req, res, next) => {
       prods: product,
       pageTitle: "Your Cart",
       path: "/cart",
-      hasProducts: product.length > 0,
-      activeShop: true,
-      productCSS: true,
     });
   });
 };
@@ -44,9 +36,6 @@ exports.getProducts = (req, res, next) => {
       prods: product,
       pageTitle: "Shop",
       path: "/products",
-      hasProducts: product.length > 0,
-      activeShop: true,
-      productCSS: true,
     });
   });
 };
@@ -56,9 +45,6 @@ exports.getCheckout = (req, res, next) => {
       prods: product,
       pageTitle: "Checkout",
       path: "/checkout",
-      hasProducts: product.length > 0,
-      activeShop: true,
-      productCSS: true,
     });
   });
 };
@@ -69,10 +55,7 @@ exports.getOrders = (req, res, next) => {
       prods: product,
       pageTitle: "Your Cart",
       path: "/orders",
-      hasProducts: product.length > 0,
-      productId: product.id,
-      activeShop: true,
-      productCSS: true,
+
     });
   });
 };
@@ -84,8 +67,6 @@ exports.getProductDetails = (req, res, next) => {
       product: product,
       pageTitle: `Details Page`,
       path: "/product-details",
-      activeShop: true,
-      productCSS: true,
     });
   });
 };
