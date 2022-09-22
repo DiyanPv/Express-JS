@@ -15,19 +15,31 @@ const getProductsFromFile = (cb) => {
   });
 };
 module.exports = class Product {
-  constructor(title, imageUrl, description, price) {
+  constructor(productId, title, imageUrl, description, price) {
     this.title = title;
     (this.image = imageUrl),
       (this.description = description),
       (this.price = price),
-      (this.productId = Math.random() + 0 + Math.random());
+      (this.productId = productId);
   }
   save() {
     getProductsFromFile((products) => {
-      products.push(this);
-      fs.writeFile(p, JSON.stringify(products), (err) => {
-        console.log(err);
-      });
+      if (this.productId) {
+        const existingProductIndex = products.findIndex(
+          (prod) => prod.productId === this.productId
+        );
+        const updatedProducts = [...products];
+        updatedProducts[existingProductIndex] = this;
+        fs.writeFile(p, JSON.stringify(updatedProducts), (err) => {
+          console.log(err);
+        });
+      } else {
+        this.productId = Math.random().toString();
+        products.push(this);
+        fs.writeFile(p, JSON.stringify(products), (err) => {
+          console.log(err);
+        });
+      }
     });
   }
   static fetchAll(cb) {
