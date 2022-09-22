@@ -55,7 +55,6 @@ exports.getOrders = (req, res, next) => {
       prods: product,
       pageTitle: "Your Cart",
       path: "/orders",
-
     });
   });
 };
