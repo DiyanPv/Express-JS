@@ -1,20 +1,5 @@
-const fs = require(`fs`);
-const path = require(`path`);
 const Cart = require(`./cart`);
-const p = path.join(
-  path.dirname(process.mainModule.filename),
-  `data`,
-  `products.json`
-);
-
-const getProductsFromFile = (cb) => {
-  fs.readFile(p, (err, fileContent) => {
-    if (err) {
-      cb([]);
-    }
-    cb(JSON.parse(fileContent));
-  });
-};
+const db = require(`../util/database`);
 module.exports = class Product {
   constructor(productId, title, imageUrl, description, price) {
     this.title = title;
@@ -24,44 +9,15 @@ module.exports = class Product {
       (this.productId = productId);
   }
   save() {
-    getProductsFromFile((products) => {
-      if (this.productId) {
-        const existingProductIndex = products.findIndex(
-          (prod) => prod.productId === this.productId
-        );
-        const updatedProducts = [...products];
-        updatedProducts[existingProductIndex] = this;
-        fs.writeFile(p, JSON.stringify(updatedProducts), (err) => {
-          console.log(err);
-        });
-      } else {
-        this.productId = Math.random().toString();
-        products.push(this);
-        fs.writeFile(p, JSON.stringify(products), (err) => {
-          console.log(err);
-        });
-      }
-    });
+    return db.execute(
+      `INSERT INTO products (title,price,description,image) VALUES (?, ?, ?, ?)`,
+      [this.title, this.price, this.description, this.image]
+    );
   }
   static fetchAll(cb) {
-    getProductsFromFile(cb);
+    return db.execute(`SELECT * FROM products`);
   }
-  static getItemById(id, cb) {
-    getProductsFromFile((products) => {
-      const product = products.find((p) => p.productId == id);
-      cb(product);
-    });
-  }
+  static getItemById(id, cb) {}
 
-  static deletebyId(id) {
-    getProductsFromFile((products) => {
-      const updatedProduct = products.filter((p) => p.productId !== id);
-      const product = products.find((prod) => prod.productId == id);
-      fs.writeFile(p, JSON.stringify(updatedProduct), (err) => {
-        if (!err) {
-          Cart.deleteProduct(product.productId, product.price);
-        }
-      });
-    });
-  }
+  static deletebyId(id) {}
 };
