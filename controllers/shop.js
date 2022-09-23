@@ -83,8 +83,6 @@ exports.getCart = (req, res, next) => {
             qty: cartProductData.qty,
           });
         }
-
-        console.log(cartProducts);
       }
       res.render("shop/cart", {
         path: "/cart",
@@ -93,4 +91,15 @@ exports.getCart = (req, res, next) => {
       });
     });
   });
+};
+
+exports.postDeleteFromCart = (req, res, next) => {
+  const prodId = req.body.productId;
+
+  Product.getItemById(prodId, (product) => {
+    console.log(prodId);
+    Cart.deleteProduct(prodId, product.price);
+  });
+
+  res.redirect("/cart");
 };
