@@ -26,12 +26,9 @@ exports.postAddProduct = (req, res, next) => {
   //   });
 
   //MYSQL
-  Product.create({
-    title,
-    image,
-    description,
-    price,
-  })
+
+  req.user
+    .createProduct({ title, image, description, price })
     .then((result) => {
       res.redirect(`/products`);
     })
@@ -39,7 +36,7 @@ exports.postAddProduct = (req, res, next) => {
 };
 
 exports.getProducts = (req, res, next) => {
-  Product.findAll().then((result) => {
+  req.user.getProducts().then((result) => {
     res.render("./admin/products", {
       prods: result,
       pageTitle: "Shop",
@@ -70,13 +67,16 @@ exports.getEditProduct = (req, res, next) => {
   //   });
   // }); DEPRECATED
 
-  Product.findByPk(prodId)
+  req.user
+    .getProducts({ where: { id: prodId } })
     .then((result) => {
+      const product = result[0];
+      console.log(product);
       res.render("./admin/edit-product", {
         pageTitle: "Edit Product",
         path: `none`,
         editing: editMode,
-        product: result,
+        product: product,
       });
     })
     .catch((err) => console.log(err));
