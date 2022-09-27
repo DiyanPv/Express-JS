@@ -52,7 +52,16 @@ exports.getCheckout = (req, res, next) => {
   });
 };
 
-exports.getOrders = (req, res, next) => {};
+exports.getOrders = (req, res, next) => {
+  req.user.getOrders({ include: [`products`] }).then((data) => {
+    console.log(data);
+    res.render(`shop/orders`, {
+      path: `/orders`,
+      pageTitle: `Your Orders`,
+      orders: data,
+    });
+  });
+};
 
 exports.getProductDetails = (req, res, next) => {
   const prodId = req.params.productId;
