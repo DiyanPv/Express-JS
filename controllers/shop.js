@@ -1,5 +1,4 @@
 const Product = require(`../models/product`);
-const Cart = require(`../models/cart`);
 exports.getIndex = (req, res, next) => {
   // Product.fetchAll()
   //   .then(([rows, fieldData]) => {
@@ -53,23 +52,7 @@ exports.getCheckout = (req, res, next) => {
   });
 };
 
-exports.getOrders = (req, res, next) => {
-  // Product.fetchAll((product) => {
-  //   res.render("./shop/orders", {
-  //     prods: product,
-  //     pageTitle: "Your orders",
-  //     path: "/orders",
-  //   });
-  // });
-
-  Product.findAll().then((result) => {
-    res.render("./shop/orders", {
-      prods: result,
-      pageTitle: "Your orders",
-      path: "/orders",
-    });
-  });
-};
+exports.getOrders = (req, res, next) => {};
 
 exports.getProductDetails = (req, res, next) => {
   const prodId = req.params.productId;
@@ -154,9 +137,46 @@ exports.getCart = (req, res, next) => {
 exports.postDeleteFromCart = (req, res, next) => {
   const prodId = req.body.productId;
 
-  Product.getItemById(prodId, (product) => {
-    Cart.deleteProduct(prodId, product.price);
-  });
+  req.user
+    .getCart()
+    .then((cart) => {
+      return cart.getProducts({ where: { id: prodId } });
+    })
+    .then((products) => {
+      const product = products[0];
+      return product.cartItem.destroy();
+    })
+    .then((res) => res.redirect(`/cart`))
+    .catch((err) => console.log(err));
 
   res.redirect("/cart");
+};
+
+exports.postAddToOrder = (req, res, next) => {
+  let fetchedCart;
+  req.user
+    .getCart()
+    .then((cart) => {
+      fetchedCart = cart;
+      return cart.getProducts();
+    })
+    .then((products) => {
+      return req.user
+        .createOrder()
+        .then((order) => {
+          return order.addProducts(
+            products.map((product) => {
+              product.orderItem = { quantity: product.cartItem.quantity };
+              return product;
+            })
+          );
+        })
+        .then((result) => {
+          return fetchedCart.setProducts(null);
+        })
+        .then((result) => {
+          res.redirect(`/orders`);
+        });
+    })
+    .catch((err) => console.log(err));
 };

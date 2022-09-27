@@ -14,4 +14,6 @@ router.get("/orders", shopController.getOrders);
 router.get("/products/:productId", shopController.getProductDetails);
 router.post("/add-to-cart", shopController.addToCart);
 router.post(`/cart-delete-item`, shopController.postDeleteFromCart);
+router.post(`/create-order`, shopController.postAddToOrder);
+
 module.exports = router;
