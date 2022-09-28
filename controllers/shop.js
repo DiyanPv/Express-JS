@@ -1,18 +1,6 @@
 const Product = require(`../models/product`);
 exports.getIndex = (req, res, next) => {
-  // Product.fetchAll()
-  //   .then(([rows, fieldData]) => {
-  //     res.render("./shop/index", {
-  //       prods: rows,
-  //       pageTitle: "Shop",
-  //       path: "/",
-  //       hasProducts: rows.length > 0,
-  //     });
-  //   })
-  //   .catch((err) => {
-  //     console.log(err);
-  //   }); DEPRECATED approach
-  Product.findAll().then((result) => {
+  Product.fetchAll().then((result) => {
     res.render("./shop/index", {
       prods: result,
       pageTitle: "Shop",
@@ -23,18 +11,8 @@ exports.getIndex = (req, res, next) => {
 };
 
 exports.getProducts = (req, res, next) => {
-  // Product.fetchAll()
-  //   .then(([rows, fieldData]) => {
-  //     res.render("./shop/products", {
-  //       prods: rows,
-  //       pageTitle: "Shop",
-  //       path: "/products",
-  //     });
-  //   })
-  //   .catch((err) => {
-  //     console.log(err);
-  //   }); DEPRECATED APPROACH
-  Product.findAll().then((result) => {
+
+  Product.fetchAll().then((result) => {
     res.render("./shop/products", {
       prods: result,
       pageTitle: "Shop",

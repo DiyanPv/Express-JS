@@ -13,7 +13,6 @@ exports.postAddProduct = (req, res, next) => {
   const image = req.body.image;
   const description = req.body.description;
   const price = req.body.price;
-
   //deprecated version
   // const product = new Product(null, title, image, description, price);
   // product
@@ -27,16 +26,14 @@ exports.postAddProduct = (req, res, next) => {
 
   //MYSQL
 
-  req.user
-    .createProduct({ title, image, description, price })
-    .then((result) => {
-      res.redirect(`/products`);
-    })
-    .catch((err) => console.log(err));
+  const product = new Product(title, price, description, image);
+  product.save().then((result) => {
+    res.redirect(`/products`);
+  });
 };
 
 exports.getProducts = (req, res, next) => {
-  req.user.getProducts().then((result) => {
+  Product.fetchAll().then((result) => {
     res.render("./admin/products", {
       prods: result,
       pageTitle: "Shop",
