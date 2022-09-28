@@ -11,7 +11,6 @@ exports.getIndex = (req, res, next) => {
 };
 
 exports.getProducts = (req, res, next) => {
-
   Product.fetchAll().then((result) => {
     res.render("./shop/products", {
       prods: result,
@@ -43,19 +42,16 @@ exports.getOrders = (req, res, next) => {
 
 exports.getProductDetails = (req, res, next) => {
   const prodId = req.params.productId;
-  console.log(prodId);
-  Product.findByPk(prodId)
-    .then((data) => {
-      console.log(data);
-      res.render("./shop/product-details", {
-        product: data,
-        pageTitle: `Details Page`,
-        path: "/product-details",
+  Product.findById(prodId)
+    .then((product) => {
+      console.log(product);
+      res.render(`shop/product-details`, {
+        product: product,
+        pageTitle: `Product Details`,
+        path: `/products`,
       });
     })
-    .catch((err) => {
-      console.log(err);
-    });
+    .catch((err) => console.log(err));
 };
 
 exports.addToCart = (req, res, next) => {
