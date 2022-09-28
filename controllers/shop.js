@@ -56,65 +56,22 @@ exports.getProductDetails = (req, res, next) => {
 
 exports.addToCart = (req, res, next) => {
   const prodId = req.body.productId;
-  let fetchedCart;
-  req.user.getCart().then((cart) => {
-    fetchedCart = cart;
-    return cart.getProducts({ where: { id: prodId } }).then((products) => {
-      let product;
-      if (products.length > 0) {
-        product = products[0];
-      }
-
-      let newQuantity = 1;
-      if (product) {
-        let oldQuantity = product.cartItem.quantity;
-        newQuantity = oldQuantity + 1;
-      }
-      return Product.findByPk(prodId)
-        .then((product) => {
-          return fetchedCart.addProduct(product, {
-            through: { quantity: newQuantity },
-          });
-        })
-        .catch((err) => console.log(err))
-        .then(() => {
-          res.redirect(`/cart`);
-        })
-        .catch((err) => console.log(err));
-    });
-  });
+  Product.findById(prodId)
+    .then((product) => {
+      return req.user.addToCart(product);
+    })
+    .then((result) => console.log(result));
 };
 
 exports.getCart = (req, res, next) => {
-  // Cart.getCart((cart) => {
-  //   Product.fetchAll((products) => {
-  //     const cartProducts = [];
-  //     for (product of products) {
-  //       const cartProductData = cart.products.find(
-  //         (prod) => prod.id === product.productId
-  //       );
-  //       if (cartProductData) {
-  //         cartProducts.push({
-  //           productData: product,
-  //           qty: cartProductData.qty,
-  //         });
-  //       }
-  //     }
-  //   });
-  // }); DEPRACATED
+  const prodId = req.body.productId;
+  Product.findById();
 
-  req.user.getCart().then((cart) => {
-    return cart
-      .getProducts()
-      .then((cartItems) => {
-        res.render("shop/cart", {
-          path: "/cart",
-          pageTitle: "Your Cart",
-          products: cartItems,
-        });
-      })
-      .catch((err) => console.log(err));
-  });
+  // res.render("shop/cart", {
+  //   path: "/cart",
+  //   pageTitle: "Your Cart",
+  //   products: cartItems,
+  // });
 };
 
 exports.postDeleteFromCart = (req, res, next) => {

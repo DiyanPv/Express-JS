@@ -1,11 +1,12 @@
 const getDb = require(`../util/database`).getDb;
 const mongoDb = require(`mongodb`);
 class Product {
-  constructor(title, price, description, image) {
+  constructor(title, price, description, image, userId) {
     this.title = title;
     this.price = price;
     this.description = description;
     this.image = image;
+    this.userId = userId;
   }
   save() {
     const db = getDb();
@@ -40,6 +41,26 @@ class Product {
         return product;
       })
       .catch((err) => {});
+  }
+
+  static updateProduct(id, title, price, image, description) {
+    const db = getDb();
+    const objectId = mongoDb.ObjectId(id);
+    return db.collection(`products`).replaceOne(
+      { _id: objectId },
+      {
+        title: title,
+        price: price,
+        image: image,
+        description: description,
+      }
+    );
+  }
+
+  static deleteOne(id) {
+    const db = getDb();
+    const objectId = mongoDb.ObjectId(id);
+    return db.collection(`products`).deleteOne({ _id: objectId });
   }
 }
 

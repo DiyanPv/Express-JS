@@ -6,7 +6,7 @@ const bodyParser = require("body-parser");
 // const Product = require(`./models/product`);
 // const Cart = require(`./models/cart`);
 // const CartItem = require(`./models/cart-item`);
-// const User = require(`./models/user`);
+const User = require(`./models/user`);
 
 // const Order = require(`./models/order`);
 // const OrderItem = require(`./models/order-item`);
@@ -20,7 +20,16 @@ const adminRoutes = require("./routes/admin");
 const shopRoutes = require("./routes/shop");
 
 app.use((req, res, next) => {
-  next();
+  const id = `633491f36bd5b53e4a684fbd`;
+  User.findById(id)
+    .then((user) => {
+      req.user = new User(user.name, user.email, user.cart, user._id);
+      next();
+    })
+    .then((user) => {
+      return user;
+    })
+    .catch((err) => console.log(err));
 });
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
@@ -65,4 +74,4 @@ mongoConnect(() => {
 //   .then((cart) => {
 //
 //   })
-//   .catch((err) => err); SQL variant -> below is MongoDB
+//   .catch((err) => err); SQL variant -> above is MongoDB

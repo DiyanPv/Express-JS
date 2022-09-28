@@ -1,5 +1,5 @@
 const Product = require(`../models/product`);
-
+const getDb = require(`../util/database`).getDb;
 exports.getAddProduct = (req, res, next) => {
   res.render("./admin/edit-product", {
     pageTitle: "Add Product",
@@ -26,7 +26,7 @@ exports.postAddProduct = (req, res, next) => {
 
   //MYSQL
 
-  const product = new Product(title, price, description, image);
+  const product = new Product(title, price, description, image, req.user._id);
   product.save().then((result) => {
     res.redirect(`/products`);
   });
@@ -63,12 +63,8 @@ exports.getEditProduct = (req, res, next) => {
   //     product: product,
   //   });
   // }); DEPRECATED
-
-  req.user
-    .getProducts({ where: { id: prodId } })
-    .then((result) => {
-      const product = result[0];
-      console.log(product);
+  Product.findById(prodId)
+    .then((product) => {
       res.render("./admin/edit-product", {
         pageTitle: "Edit Product",
         path: `none`,
@@ -85,28 +81,20 @@ exports.postEditProduct = (req, res, next) => {
   const updatedPrice = req.body.price;
   const updatedImageUrl = req.body.image;
   const updatedDesc = req.body.description;
-  Product.findByPk(productId)
-    .then((product) => {
-      product.title = updatedTitle;
-      product.price = updatedPrice;
-      product.image = updatedImageUrl;
-      product.description = updatedDesc;
-      product.save();
-      res.redirect("/admin/products");
-    })
-    .catch((err) => err);
+
+  Product.updateProduct(
+    productId,
+    updatedTitle,
+    updatedPrice,
+    updatedImageUrl,
+    updatedDesc
+  ).then(res.redirect(`/products`));
 };
 
 exports.postDeleteProduct = (req, res, next) => {
   const prodId = req.body.productId;
 
-  Product.findByPk(prodId)
-    .then((product) => {
-      return product.destroy();
-    })
-    .then((result) => {
-      console.log(`Destroyed Product`);
-      res.redirect("/admin/products");
-    })
-    .catch((err) => err);
+  Product.deleteOne(prodId).then((result) => {
+    res.redirect(`/products`);
+  });
 };
