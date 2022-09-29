@@ -1,5 +1,5 @@
 const Product = require(`../models/product`);
-const getDb = require(`../util/database`).getDb;
+
 exports.getAddProduct = (req, res, next) => {
   res.render("./admin/edit-product", {
     pageTitle: "Add Product",
@@ -26,14 +26,20 @@ exports.postAddProduct = (req, res, next) => {
 
   //MYSQL
 
-  const product = new Product(title, price, description, image, req.user._id);
+  const product = new Product({
+    title: title,
+    image: image,
+    description: description,
+    price: price,
+    userId: req.user,
+  });
   product.save().then((result) => {
     res.redirect(`/products`);
   });
 };
 
 exports.getProducts = (req, res, next) => {
-  Product.fetchAll().then((result) => {
+  Product.find().then((result) => {
     res.render("./admin/products", {
       prods: result,
       pageTitle: "Shop",
@@ -81,20 +87,21 @@ exports.postEditProduct = (req, res, next) => {
   const updatedPrice = req.body.price;
   const updatedImageUrl = req.body.image;
   const updatedDesc = req.body.description;
-
-  Product.updateProduct(
-    productId,
-    updatedTitle,
-    updatedPrice,
-    updatedImageUrl,
-    updatedDesc
-  ).then(res.redirect(`/products`));
+  Product.findById(productId)
+    .then((product) => {
+      product.title = updatedTitle;
+      product.price = updatedPrice;
+      product.image = updatedImageUrl;
+      product.description = updatedDesc;
+      return product.save();
+    })
+    .then(res.redirect(`/products`));
 };
 
 exports.postDeleteProduct = (req, res, next) => {
   const prodId = req.body.productId;
 
-  Product.deleteOne(prodId).then((result) => {
+  Product.findByIdAndRemove(prodId).then((result) => {
     res.redirect(`/products`);
   });
 };

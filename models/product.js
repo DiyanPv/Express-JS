@@ -1,67 +1,27 @@
-const getDb = require(`../util/database`).getDb;
-const mongoDb = require(`mongodb`);
-class Product {
-  constructor(title, price, description, image, userId) {
-    this.title = title;
-    this.price = price;
-    this.description = description;
-    this.image = image;
-    this.userId = userId;
-  }
-  save() {
-    const db = getDb();
-    return db
-      .collection(`products`)
-      .insertOne(this)
-      .then((res) => res)
-      .catch((err) => console.log(err));
-  }
+// const getDb = require(`../util/database`).getDb;
+// const mongoDb = require(`mongodb`);
+const mongoose = require(`mongoose`);
 
-  static fetchAll() {
-    const db = getDb();
-    return db
-      .collection(`products`)
-      .find()
-      .toArray()
-      .then((res) => res)
-      .catch((err) => console.log(err));
-  }
+const Schema = mongoose.Schema;
 
-  static findById(id) {
-    id = id.trim();
-    console.log(id);
-    const objectId = mongoDb.ObjectId(id);
-    const db = getDb();
-    return db
-      .collection(`products`)
-      .find({ _id: objectId })
-      .next()
-      .then((product) => {
-        console.log(product);
-        return product;
-      })
-      .catch((err) => {});
-  }
+const productSchema = new Schema({
+  title: String,
+  price: {
+    type: Number,
+    required: true,
+  },
+  image: {
+    type: String,
+    required: true,
+  },
+  description: {
+    type: String,
+    required: true,
+  },
+  userId: {
+    type: Schema.Types.ObjectId,
+    ref: `User`,
+  },
+});
 
-  static updateProduct(id, title, price, image, description) {
-    const db = getDb();
-    const objectId = mongoDb.ObjectId(id);
-    return db.collection(`products`).replaceOne(
-      { _id: objectId },
-      {
-        title: title,
-        price: price,
-        image: image,
-        description: description,
-      }
-    );
-  }
-
-  static deleteOne(id) {
-    const db = getDb();
-    const objectId = mongoDb.ObjectId(id);
-    return db.collection(`products`).deleteOne({ _id: objectId });
-  }
-}
-
-module.exports = Product;
+module.exports = mongoose.model(`Product`, productSchema);
