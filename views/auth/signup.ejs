@@ -25,7 +25,12 @@
             </div>
         
             <button class="btn" type="submit">Create Account!</button>
+        <input type="hidden" value="<%= csrfToken %>" name="_csrf">
              
         </form>
+        <% if(error) {%>
+            <div class="user-message--error">
+          <%= error %>
+        </div>  <%} %>
     </main>
 <%- include('../includes/end.ejs') %>

@@ -4,7 +4,6 @@ exports.getAddProduct = (req, res, next) => {
   res.render("./admin/edit-product", {
     pageTitle: "Add Product",
     path: "/admin/add-product",
-    isAuthenticated: req.session.isLoggedIn,
     editing: false,
   });
 };
@@ -44,7 +43,7 @@ exports.getProducts = (req, res, next) => {
     res.render("./admin/products", {
       prods: result,
       pageTitle: "Shop",
-      isAuthenticated: req.session.isLoggedIn,
+
       path: "/admin/products",
     });
   });
@@ -57,6 +56,9 @@ exports.getProducts = (req, res, next) => {
   // }); DEPRECATED
 };
 exports.getEditProduct = (req, res, next) => {
+  if (!req.session.isLoggedIn) {
+    return res.redirect(`/login`);
+  }
   const editMode = req.query.edit;
   if (!editMode) {
     return res.redirect(`/`);
@@ -77,7 +79,6 @@ exports.getEditProduct = (req, res, next) => {
         pageTitle: "Edit Product",
         path: `none`,
         editing: editMode,
-        isAuthenticated: req.session.isLoggedIn,
 
         product: product,
       });
@@ -86,6 +87,9 @@ exports.getEditProduct = (req, res, next) => {
 };
 
 exports.postEditProduct = (req, res, next) => {
+  if (!req.session.isLoggedIn) {
+    return res.redirect(`/login`);
+  }
   const productId = req.body.productId;
   const updatedTitle = req.body.title;
   const updatedPrice = req.body.price;

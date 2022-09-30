@@ -7,7 +7,10 @@ const User = require(`./models/user`);
 const authRoutes = require(`./routes/auth`);
 const session = require(`express-session`);
 const MonboDBStore = require(`connect-mongodb-session`)(session);
+const flash = require(`connect-flash`);
+const csrf = require(`csurf`);
 
+const csrfProtection = csrf();
 const app = express();
 app.set("view engine", "ejs");
 app.set("views", "views");
@@ -45,6 +48,7 @@ app.use((req, res, next) => {
     })
     .catch((err) => console.log(err));
 });
+app.use(csrfProtection);
 
 mongoose.connect(MongoDB_URI).then((result) => {
   User.findOne()
@@ -65,6 +69,13 @@ mongoose.connect(MongoDB_URI).then((result) => {
       app.listen(3000);
     })
     .catch((err) => console.log(err));
+});
+
+app.use(flash());
+app.use((req, res, next) => {
+  res.locals.isAuthenticated = req.session.isLoggedIn || null;
+  res.locals.csrfToken = req.csrfToken() || null;
+  next();
 });
 
 app.use("/admin", adminRoutes);

@@ -1,11 +1,16 @@
 const ObjectId = require(`mongodb`).ObjectId;
 const User = require(`../models/user`);
+const nodemailer = require(`nodemailer`);
+const sendGridTransport = require(`nodemailer-sendgrid-transport`);
 const bcrypt = require(`bcryptjs`);
 exports.getLogin = (req, res, next) => {
+  let message = req.flash(`error`);
+  if (message.length <= 0) {
+    message = null;
+  }
   res.render(`auth/login`, {
     path: `/login`,
-    isAuthenticated: req.session.isLoggedIn,
-
+    error: message,
     pageTitle: `Login`,
   });
 };
@@ -16,6 +21,8 @@ exports.postLogin = (req, res, next) => {
   User.findOne({ email: email })
     .then((user) => {
       if (!user) {
+        req.flash(`error`, `Incorrect Email or Password`);
+
         return res.redirect(`/login`);
       }
       bcrypt
@@ -28,9 +35,12 @@ exports.postLogin = (req, res, next) => {
               res.redirect(`/`);
             });
           }
+          req.flash(`error`, `Incorrect Email or Password`);
           res.redirect(`/login`);
         })
         .catch((err) => {
+          req.flash(`error`, `Incorrect Email or Password`);
+
           res.redirect(`/login`);
         });
     })
@@ -50,6 +60,7 @@ exports.postSignup = (req, res, next) => {
   User.findOne({ email: email })
     .then((userDoc) => {
       if (userDoc) {
+        req.flash(`error`, `User already exists!`);
         return res.redirect(`/signup`);
       }
       return bcrypt.hash(password, 12).then((hashPass) => {
@@ -71,14 +82,20 @@ exports.postSignup = (req, res, next) => {
       if (result) {
         return res.redirect(`/login`);
       }
-      return res.redirect(`signup`);
+      return res.redirect(`/signup`);
     })
+    .then((result) => console.log(`Redirected`))
     .catch((err) => console.log(err));
 };
 exports.getSignup = (req, res, next) => {
+  let message = req.flash(`error`);
+  if (message.length <= 0) {
+    message = null;
+  }
   res.render(`auth/signup`, {
     path: `/signup`,
-    isAuthenticated: req.session.isLoggedIn,
+    error: message,
+
     pageTitle: `Create Account`,
   });
 };
