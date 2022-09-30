@@ -57,10 +57,8 @@
               <a class="<%= path === '/login' ? 'btn active' : 'btn' %>" href="/login">Login</a>
           </li>
           <li class="main-header__item">
-          <form action="/signup" method="post" class="main-header__item">
-            <button type="submit" class="btn" >Create Account</button>
-        </form>
-            </li>
+            <a class="<%= path === '/sigup' ? 'btn active' : 'btn' %>" href="/signup">Create Account</a>
+        </li>
           </ul>
       <%} %>
   

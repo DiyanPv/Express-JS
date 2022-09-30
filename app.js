@@ -53,12 +53,15 @@ mongoose.connect(MongoDB_URI).then((result) => {
         const user = new User({
           name: `Diyan`,
           email: `diyan@abv.bg`,
+          password: "123",
           cart: {
             items: [],
           },
         });
-        user.save();
+        return user.save();
       }
+    })
+    .then((result) => {
       app.listen(3000);
     })
     .catch((err) => console.log(err));
