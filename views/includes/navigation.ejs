@@ -10,23 +10,27 @@
           >Products</a
         >
       </li>
-
-      <li class="main-header__item">
-        <a class="<%= path === '/cart' ? 'active' : '' %>" href="/cart">Cart</a>
-      </li>
-      <li class="main-header__item">
-        <a
-          class="<%= path === '/admin/add-product' ? 'active' : '' %>"
-          href="/admin/add-product"
-          >Add Product</a
-        >
-      </li>
-
-      <li class="main-header__item">
-        <a class="<%= path === '/orders' ? 'active' : '' %>" href="/orders"
-          >Orders</a
-        >
-      </li>
+      <% if(isAuthenticated){%>  
+        <li class="main-header__item">
+          <a class="<%= path === '/cart' ? 'active' : '' %>" href="/cart">Cart</a>
+        </li>
+        <li class="main-header__item">
+          <a class="<%= path === '/orders' ? 'active' : '' %>" href="/orders"
+            >Orders</a
+          >
+        </li>
+      
+      <%} %>
+     
+      
+     
+      <% if(isAuthenticated){%>  
+        <li class="main-header__item">
+          <a
+            class="<%= path === '/admin/add-product' ? 'active' : '' %>"
+            href="/admin/add-product"
+            >Add Product</a
+          >
       <li class="main-header__item">
         <a
           class="<%= path === '/admin/products' ? 'active' : '' %>"
@@ -34,6 +38,36 @@
           >Admin Products</a
         >
       </li>
+
+      <%} %>
     </ul>
+
+    <% if(isAuthenticated){%>  
+      
+    
+        <form action="/logout" method="post" class="main-header__item">
+        
+            <button type="submit" class="btn" >Logout</button>
+        </form>
+     
+      
+      <%} else{ %>
+    <ul class="main-header__item-list">
+          <li class="main-header__item">
+              <a class="<%= path === '/login' ? 'btn active' : 'btn' %>" href="/login">Login</a>
+          </li>
+          <li class="main-header__item">
+          <form action="/signup" method="post" class="main-header__item">
+            <button type="submit" class="btn" >Create Account</button>
+        </form>
+            </li>
+          </ul>
+      <%} %>
+  
+    
+  </ul>
+
+
+  
   </nav>
 </header>

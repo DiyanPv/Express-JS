@@ -1,11 +1,15 @@
 const Product = require(`../models/product`);
 const Order = require(`../models/order`);
 exports.getIndex = (req, res, next) => {
+  console.log(req.session.user);
+
   Product.find().then((result) => {
     res.render("./shop/index", {
       prods: result,
       pageTitle: "Shop",
       path: "/",
+      isAuthenticated: req.session.isLoggedIn,
+
       hasProducts: result.length > 0,
     });
   });
@@ -16,6 +20,8 @@ exports.getProducts = (req, res, next) => {
     res.render("./shop/products", {
       prods: result,
       pageTitle: "Shop",
+      isAuthenticated: req.session.isLoggedIn,
+
       path: "/products",
     });
   });
@@ -25,6 +31,8 @@ exports.getCheckout = (req, res, next) => {
     res.render("./shop/cart", {
       prods: product,
       pageTitle: "Checkout",
+      isAuthenticated: req.session.isLoggedIn,
+
       path: "/checkout",
     });
   });
@@ -35,6 +43,8 @@ exports.getOrders = (req, res, next) => {
     res.render(`shop/orders`, {
       path: `/orders`,
       pageTitle: `Your Orders`,
+      isAuthenticated: req.session.isLoggedIn,
+
       orders: orders,
     });
   });
@@ -48,6 +58,8 @@ exports.getProductDetails = (req, res, next) => {
       res.render(`shop/product-details`, {
         product: product,
         pageTitle: `Product Details`,
+        isAuthenticated: req.session.isLoggedIn,
+
         path: `/products`,
       });
     })
@@ -56,15 +68,14 @@ exports.getProductDetails = (req, res, next) => {
 
 exports.addToCart = (req, res, next) => {
   const prodId = req.body.productId;
-
   Product.findById(prodId)
     .then((product) => {
-      console.log(req.user);
       return req.user.addToCart(product);
     })
     .then((result) => {
       res.redirect(`/cart`);
-    });
+    })
+    .catch((err) => console.log(err));
 };
 
 exports.getCart = (req, res, next) => {
@@ -74,6 +85,8 @@ exports.getCart = (req, res, next) => {
     res.render("shop/cart", {
       path: "/cart",
       pageTitle: "Your Cart",
+      isAuthenticated: req.session.isLoggedIn,
+
       products: products,
     });
   });
@@ -100,7 +113,7 @@ exports.postAddToOrder = (req, res, next) => {
         products: products,
         user: {
           name: req.user.name,
-          userId: req.user,
+          userId: req.session.user,
         },
       });
       return order.save();
