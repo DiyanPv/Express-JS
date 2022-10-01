@@ -1,5 +1,6 @@
 const ObjectId = require(`mongodb`).ObjectId;
 const User = require(`../models/user`);
+const { validationResult } = require(`express-validator`);
 const nodemailer = require(`nodemailer`);
 const sendGridTransport = require(`nodemailer-sendgrid-transport`);
 const bcrypt = require(`bcryptjs`);
@@ -18,6 +19,14 @@ exports.getLogin = (req, res, next) => {
 exports.postLogin = (req, res, next) => {
   const email = req.body.email;
   const password = req.body.password;
+  const errorValidation = validationResult(req);
+  if (!errorValidation.isEmpty()) {
+    return res.status(422).render(`auth/login`, {
+      path: `/login`,
+      error: errorValidation.array()[0].msg,
+      pageTitle: `Login`,
+    });
+  }
   User.findOne({ email: email })
     .then((user) => {
       if (!user) {
@@ -56,7 +65,15 @@ exports.postSignup = (req, res, next) => {
   const email = req.body.email;
   const password = req.body.password;
   const confirmpass = req.body.confirmpassword;
+  const errorValidation = validationResult(req);
+  if (!errorValidation.isEmpty()) {
+    return res.status(422).render(`auth/signup`, {
+      path: `/signup`,
+      error: errorValidation.array()[0].msg,
 
+      pageTitle: `Create Account`,
+    });
+  }
   User.findOne({ email: email })
     .then((userDoc) => {
       if (userDoc) {

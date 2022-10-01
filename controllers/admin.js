@@ -90,26 +90,32 @@ exports.postEditProduct = (req, res, next) => {
   if (!req.session.isLoggedIn) {
     return res.redirect(`/login`);
   }
+
   const productId = req.body.productId;
   const updatedTitle = req.body.title;
   const updatedPrice = req.body.price;
   const updatedImageUrl = req.body.image;
   const updatedDesc = req.body.description;
-  Product.findById(productId)
-    .then((product) => {
-      product.title = updatedTitle;
-      product.price = updatedPrice;
-      product.image = updatedImageUrl;
-      product.description = updatedDesc;
-      return product.save();
-    })
-    .then(res.redirect(`/products`));
+  Product.findById(productId).then((product) => {
+    if (product.userId.toString() !== req.user._id.toString()) {
+      return res.redirect(`/`);
+    }
+    product.title = updatedTitle;
+    product.price = updatedPrice;
+    product.image = updatedImageUrl;
+    product.description = updatedDesc;
+    return product.save().then(res.redirect(`/products`));
+  });
 };
 
 exports.postDeleteProduct = (req, res, next) => {
   const prodId = req.body.productId;
-
-  Product.findByIdAndRemove(prodId).then((result) => {
-    res.redirect(`/products`);
-  });
+  return Product.deleteOne({ _id: prodId, userId: req.user._id }).then(
+    (result) => {
+      res.redirect(`/products`);
+    }
+  );
+  // Product.findByIdAndRemove(prodId).then((result) => {
+  //   res.redirect(`/products`);
+  // });
 };

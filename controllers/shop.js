@@ -1,7 +1,8 @@
 const Product = require(`../models/product`);
 const Order = require(`../models/order`);
 exports.getIndex = (req, res, next) => {
-  Product.find({ userId: req.user._id }).then((result) => {
+  console.log(req.user);
+  Product.find().then((result) => {
     res.render("./shop/index", {
       prods: result,
       pageTitle: "Shop",
@@ -12,7 +13,7 @@ exports.getIndex = (req, res, next) => {
 };
 
 exports.getProducts = (req, res, next) => {
-  Product.find({ userId: req.user._id }).then((result) => {
+  Product.find().then((result) => {
     res.render("./shop/products", {
       prods: result,
       pageTitle: "Shop",
