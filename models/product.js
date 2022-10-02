@@ -22,6 +22,9 @@ const productSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: `User`,
   },
+  currentDate: {
+    type: Schema.Types.Date,
+  },
 });
 
 module.exports = mongoose.model(`Product`, productSchema);

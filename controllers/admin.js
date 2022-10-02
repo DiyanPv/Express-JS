@@ -10,7 +10,7 @@ exports.getAddProduct = (req, res, next) => {
 
 exports.postAddProduct = (req, res, next) => {
   const title = req.body.title;
-  const image = req.body.image;
+  const image = req.file;
   const description = req.body.description;
   const price = req.body.price;
   //deprecated version
@@ -26,9 +26,13 @@ exports.postAddProduct = (req, res, next) => {
 
   //MYSQL
 
+  console.log(image);
+  if (!image) {
+    return res.status(500).redirect(`/admin/add-product`);
+  }
   const product = new Product({
     title: title,
-    image: image,
+    image: image.path,
     description: description,
     price: price,
     userId: req.user,
@@ -43,7 +47,6 @@ exports.getProducts = (req, res, next) => {
     res.render("./admin/products", {
       prods: result,
       pageTitle: "Shop",
-
       path: "/admin/products",
     });
   });
@@ -73,17 +76,15 @@ exports.getEditProduct = (req, res, next) => {
   //     product: product,
   //   });
   // }); DEPRECATED
-  Product.findById(prodId)
-    .then((product) => {
-      res.render("./admin/edit-product", {
-        pageTitle: "Edit Product",
-        path: `none`,
-        editing: editMode,
+  Product.findById(prodId).then((product) => {
+    res.render("./admin/edit-product", {
+      pageTitle: "Edit Product",
+      path: `none`,
+      editing: editMode,
 
-        product: product,
-      });
-    })
-    .catch((err) => console.log(err));
+      product: product,
+    });
+  });
 };
 
 exports.postEditProduct = (req, res, next) => {
@@ -94,17 +95,19 @@ exports.postEditProduct = (req, res, next) => {
   const productId = req.body.productId;
   const updatedTitle = req.body.title;
   const updatedPrice = req.body.price;
-  const updatedImageUrl = req.body.image;
+  const updatedImageUrl = req.file;
   const updatedDesc = req.body.description;
   Product.findById(productId).then((product) => {
     if (product.userId.toString() !== req.user._id.toString()) {
       return res.redirect(`/`);
     }
+    if (image) {
+      product.imageUrl = image.path;
+    }
     product.title = updatedTitle;
     product.price = updatedPrice;
-    product.image = updatedImageUrl;
     product.description = updatedDesc;
-    return product.save().then(res.redirect(`/products`));
+    return product.save().then(res.redirect(`/admin/products`));
   });
 };
 
@@ -112,7 +115,7 @@ exports.postDeleteProduct = (req, res, next) => {
   const prodId = req.body.productId;
   return Product.deleteOne({ _id: prodId, userId: req.user._id }).then(
     (result) => {
-      res.redirect(`/products`);
+      res.redirect(`/admin/products`);
     }
   );
   // Product.findByIdAndRemove(prodId).then((result) => {
