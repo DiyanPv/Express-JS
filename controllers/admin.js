@@ -1,5 +1,5 @@
 const Product = require(`../models/product`);
-
+const fs = require(`fs`);
 exports.getAddProduct = (req, res, next) => {
   res.render("./admin/edit-product", {
     pageTitle: "Add Product",
@@ -13,6 +13,10 @@ exports.postAddProduct = (req, res, next) => {
   const image = req.file;
   const description = req.body.description;
   const price = req.body.price;
+  console.log(image);
+  // const extension = image.originalname.split(`.`)[1];
+  imagepath = image.path.toString();
+  console.log(imagepath);
   //deprecated version
   // const product = new Product(null, title, image, description, price);
   // product
@@ -26,13 +30,12 @@ exports.postAddProduct = (req, res, next) => {
 
   //MYSQL
 
-  console.log(image);
   if (!image) {
     return res.status(500).redirect(`/admin/add-product`);
   }
   const product = new Product({
     title: title,
-    image: image.path,
+    image: imagepath,
     description: description,
     price: price,
     userId: req.user,
@@ -66,6 +69,7 @@ exports.getEditProduct = (req, res, next) => {
   if (!editMode) {
     return res.redirect(`/`);
   }
+
   const prodId = req.params.productId;
   // Product.getItemById(prodId, (product) => {
   //   console.log(product);
@@ -88,6 +92,13 @@ exports.getEditProduct = (req, res, next) => {
 };
 
 exports.postEditProduct = (req, res, next) => {
+  const deleteFile = (filePath) => {
+    fs.unlink(filePath, (err) => {
+      if (err) {
+        throw new Error(err);
+      }
+    });
+  };
   if (!req.session.isLoggedIn) {
     return res.redirect(`/login`);
   }
@@ -95,7 +106,7 @@ exports.postEditProduct = (req, res, next) => {
   const productId = req.body.productId;
   const updatedTitle = req.body.title;
   const updatedPrice = req.body.price;
-  const updatedImageUrl = req.file;
+  const updatedImageUrl = req.file.replace("\\", "/");
   const updatedDesc = req.body.description;
   Product.findById(productId).then((product) => {
     if (product.userId.toString() !== req.user._id.toString()) {
@@ -103,6 +114,7 @@ exports.postEditProduct = (req, res, next) => {
     }
     if (image) {
       product.imageUrl = image.path;
+      // deleteFile(product.imageUrl);
     }
     product.title = updatedTitle;
     product.price = updatedPrice;
@@ -113,9 +125,17 @@ exports.postEditProduct = (req, res, next) => {
 
 exports.postDeleteProduct = (req, res, next) => {
   const prodId = req.body.productId;
+  Product.findById(prodId)
+    .then((product) => {
+      if (!product) {
+        return res.redirect(`/admin/products`);
+      }
+    })
+    .catch((err) => next(err));
+
   return Product.deleteOne({ _id: prodId, userId: req.user._id }).then(
     (result) => {
-      res.redirect(`/admin/products`);
+      return res.redirect(`/admin/products`);
     }
   );
   // Product.findByIdAndRemove(prodId).then((result) => {

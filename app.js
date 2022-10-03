@@ -30,6 +30,7 @@ const fileStorage = multer.diskStorage({
   },
   filename: (req, file, cb) => {
     cb(null, uuidv4());
+    cb(null, uuidv4() + file.originalname);
   },
 });
 
@@ -49,6 +50,7 @@ app.use(
   multer({ storage: fileStorage, fileFilter: fileFilters }).single(`image`)
 );
 app.use(express.static(path.join(__dirname, "public")));
+app.use("\\images", express.static(path.join(__dirname, "images")));
 
 app.use(
   session({
