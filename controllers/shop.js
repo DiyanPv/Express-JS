@@ -3,27 +3,65 @@ const Order = require(`../models/order`);
 
 const fs = require(`fs`);
 const PDFDocument = require(`pdfkit`);
+const ITEMS_PER_PAGE = 2;
 exports.getIndex = (req, res, next) => {
-  console.log(req.user);
-  Product.find().then((result) => {
-    res.render("./shop/index", {
-      prods: result,
-      pageTitle: "Shop",
-      path: "/",
-      hasProducts: result.length > 0,
+  const page = Number(req.query.page) || 1;
+  let totalItems;
+
+  Product.find()
+    .count()
+    .then((numProducts) => {
+      totalItems = numProducts;
+      return Product.find()
+        .skip((page - 1) * ITEMS_PER_PAGE)
+        .limit(ITEMS_PER_PAGE);
+    })
+    .then((products) => {
+      res.render("shop/index", {
+        prods: products,
+        pageTitle: "Shop",
+        path: "/",
+        totalProducts: totalItems,
+        hasNextPage: ITEMS_PER_PAGE * page < totalItems,
+        hasPreviousPage: page > 1,
+        nextPage: page + 1,
+        previousPage: page - 1,
+        lastPage: Math.ceil(totalItems / ITEMS_PER_PAGE),
+        currentPage: Number(page),
+      });
+    })
+    .catch((err) => {
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
     });
-  });
 };
 
 exports.getProducts = (req, res, next) => {
-  Product.find().then((result) => {
-    console.log(result);
-    res.render("./shop/products", {
-      prods: result,
-      pageTitle: "Shop",
-      path: "/products",
+  const page = Number(req.query.page) || 1;
+
+  Product.find()
+    .count()
+    .then((numProducts) => {
+      totalItems = numProducts;
+      return Product.find()
+        .skip((page - 1) * ITEMS_PER_PAGE)
+        .limit(ITEMS_PER_PAGE);
+    })
+    .then((products) => {
+      res.render("shop/products", {
+        prods: products,
+        pageTitle: "Products",
+        path: "/products",
+        totalProducts: totalItems,
+        hasNextPage: ITEMS_PER_PAGE * page < totalItems,
+        hasPreviousPage: page > 1,
+        nextPage: page + 1,
+        previousPage: page - 1,
+        lastPage: Math.ceil(totalItems / ITEMS_PER_PAGE),
+        currentPage: page,
+      });
     });
-  });
 };
 exports.getCheckout = (req, res, next) => {
   Product.find((product) => {
