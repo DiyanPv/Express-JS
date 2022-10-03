@@ -23,3 +23,13 @@
   margin: 0;
 }
 
+.btn a {
+  text-decoration: none;
+}
+.btn:hover,
+.btn a:hover {
+  text-decoration: none;
+
+  color: wheat;
+  background: green;
+}

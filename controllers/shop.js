@@ -1,6 +1,5 @@
 const Product = require(`../models/product`);
 const Order = require(`../models/order`);
-
 const fs = require(`fs`);
 const PDFDocument = require(`pdfkit`);
 const ITEMS_PER_PAGE = 2;
@@ -64,12 +63,25 @@ exports.getProducts = (req, res, next) => {
     });
 };
 exports.getCheckout = (req, res, next) => {
-  Product.find((product) => {
-    res.render("./shop/cart", {
-      prods: product,
-      pageTitle: "Checkout",
+  // const prodId = req.body.productId;
+  // req.user.populate(`cart.items.productId`).then((user) => {
+  //   const products = user.cart.items;
+  //   res.render("shop/cart", {
+  //     path: "/cart",
 
-      path: "/checkout",
+  const prodId = req.body.productId;
+  req.user.populate(`cart.items.productId`).then((user) => {
+    console.log(user);
+    const products = user.cart.items;
+    let total = 0;
+    products.forEach((p) => {
+      total += p.quantity * p.productId.price;
+    });
+    res.render("shop/checkout", {
+      path: "checkout",
+      pageTitle: "Checkout",
+      totalSum: total,
+      products: products,
     });
   });
 };

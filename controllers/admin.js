@@ -1,5 +1,6 @@
 const Product = require(`../models/product`);
 const fs = require(`fs`);
+const deleteProductFunc = require(`../util/admin`);
 exports.getAddProduct = (req, res, next) => {
   res.render("./admin/edit-product", {
     pageTitle: "Add Product",
@@ -51,6 +52,7 @@ exports.getProducts = (req, res, next) => {
       prods: result,
       pageTitle: "Shop",
       path: "/admin/products",
+      deleteProduct: deleteProductFunc,
     });
   });
   // Product.fetchAll((product) => {
